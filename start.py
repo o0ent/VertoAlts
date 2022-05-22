@@ -91,6 +91,53 @@ async def dumpStock(ctx):
         filePath = f"accounts/{interaction.values[0]}.txt"
         await interaction.send(file=discord.File(filePath))
 
+@client.command(name="delete")
+@commands.guild_only()
+@commands.has_permissions(administrator = True)
+async def dumpStock(ctx):
+        dir_list = os.listdir("accounts")
+        productsList = []
+        for i in dir_list:
+            line_count = 0
+            totalAccs = open(f"accounts/{i}","r")
+            prodName = i.split(".txt")[0]
+            productsList.append(SelectOption(label = prodName, value = prodName,description=f"{thousand_sep(len(totalAccs.readlines()))} accounts"))
+            totalAccs.close()
+        await ctx.send(
+            "Select",
+            components = [
+                Select(
+                    placeholder = "Delete product or delete accs",
+                    options = [SelectOption(label = "Delete product", value = "delProd",description=f"Deletes products"),SelectOption(label = "Delete accounts", value = "delAccs",description=f"Deletes accounts")]
+                )
+            ]
+        )
+
+        interaction = await client.wait_for("select_option")
+        deleteType = interaction.values[0]
+        
+        await interaction.send(
+            "Select",
+            components = [
+                Select(
+                    placeholder = "Select",
+                    options = productsList
+                )
+            ]
+        )
+
+        interaction = await client.wait_for("select_option")
+        productSel = interaction.values[0]
+
+        filePath = f"accounts/{productSel}.txt"
+        if deleteType == "delProd":
+            os.remove(filePath)
+            await ctx.send("Product deleted")
+        elif deleteType == "delAccs":
+            open(filePath, 'w').close()
+            await ctx.send("Accounts deleted")
+
+
 #Users commands
 @client.command(name="gen",descriprion="Generates account")
 @commands.guild_only()
@@ -103,6 +150,7 @@ async def genStock(ctx):
             totalAccs = open(f"accounts/{i}","r")
             prodName = i.split(".txt")[0]
             productsList.append(SelectOption(label = prodName, value = prodName,description=f"{thousand_sep(len(totalAccs.readlines()))} accounts"))
+            totalAccs.close()
         await ctx.send(
             "Hello, welcome to Verto Alts, if you want to generate a product, below you can select your favorite product and it will automatically send you a PM.",
             components = [
@@ -138,7 +186,7 @@ async def genStock(ctx):
                         for i in d:
                             if i != random_line_content:
                                 f.write(i)
-                        f.truncate()        
+                        f.truncate()      
         except ValueError:
             embed=discord.Embed(title="VertoAlts | Error",description = 'Product is out of stock, generate another one', color=0xdd0000)
             await interaction.send(embed=embed)
@@ -158,7 +206,7 @@ async def getStock(ctx):
         line_count = 0
         totalAccs = open(f"accounts/{i}","r")
         embed.add_field(name=i.split(".txt")[0], value=thousand_sep(len(totalAccs.readlines())), inline=True)
-    
+        totalAccs.close()
     embed.set_footer(text=f"requested by {ctx.author.name}#{ctx.author.discriminator}")
     await ctx.send(embed=embed)
 
