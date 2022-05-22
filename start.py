@@ -66,6 +66,31 @@ async def createStock(ctx, arg):
         productName = open(filePath, 'w')
         await ctx.send(f"Created product with name **{arg}**")
 
+@client.command(name="dump")
+@commands.guild_only()
+@commands.has_permissions(administrator = True)
+async def dumpStock(ctx):
+        dir_list = os.listdir("accounts")
+        productsList = []
+        for i in dir_list:
+            line_count = 0
+            totalAccs = open(f"accounts/{i}","r")
+            prodName = i.split(".txt")[0]
+            productsList.append(SelectOption(label = prodName, value = prodName,description=f"{thousand_sep(len(totalAccs.readlines()))} accounts"))
+        await ctx.send(
+            "Select product to dump",
+            components = [
+                Select(
+                    placeholder = "Dump",
+                    options = productsList
+                )
+            ]
+        )
+
+        interaction = await client.wait_for("select_option")
+        filePath = f"accounts/{interaction.values[0]}.txt"
+        await interaction.send(file=discord.File(filePath))
+
 #Users commands
 @client.command(name="gen",descriprion="Generates account")
 @commands.guild_only()
@@ -136,9 +161,6 @@ async def getStock(ctx):
     
     embed.set_footer(text=f"requested by {ctx.author.name}#{ctx.author.discriminator}")
     await ctx.send(embed=embed)
-
-
-
 
 
 client.run(config["token"])
