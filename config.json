@@ -1,0 +1,8 @@
+{
+    "token":"Your token",
+    "prefix":">",
+    "channelId":Channel ID,
+    "accountstoGen":1,
+    "deleteAccsfromDB":true,
+    "phoneStatus":true
+}
