@@ -6,11 +6,13 @@ import json
 import os
 import time
 from discord.gateway import DiscordWebSocket
+from collections import Counter
 
 configFile = open("config.json")
 config = json.load(configFile)
 
 client = ComponentsBot(command_prefix = config["prefix"])
+
 
 def thousand_sep(num):
     return ("{:,}".format(num))
@@ -34,40 +36,44 @@ async def on_ready():
 
 
 #Admin commands
+
 @client.command(name="restock",descriprion="Restock product")
 @commands.guild_only()
 @commands.has_permissions(administrator = True)
 async def reStock(ctx, arg):
     filePath = f"accounts/{arg}.txt"
-    for attachment in ctx.message.attachments:
-        await attachment.save(attachment.filename)
-        fileStock = open(attachment.filename,"r")
-        toStock = open(filePath,"a")
-        for line in fileStock:
-            toStock.write(line)
-        toStock.write("\n")
+    if any(role.id in config["restockerRole"] for role in ctx.author.roles):
+        for attachment in ctx.message.attachments:
+            
+            await attachment.save(attachment.filename)
+            fileStock = open(attachment.filename,"r")
+            toStock = open(filePath,"a")
+            for line in fileStock:
+                toStock.write(line)
+            toStock.write("\n")
 
-        fileStock.close()
-        
-    time.sleep(0.5)
-    os.remove(attachment.filename)
+            fileStock.close()
+            
+        time.sleep(0.5)
+        os.remove(attachment.filename)
 
-    await ctx.send("Successfully restocked!")
+        await ctx.send("Successfully restocked!")
 
 @client.command(name="create")
 @commands.guild_only()
 @commands.has_permissions(administrator = True)
 async def createStock(ctx, arg):
-    filePath = f"accounts/{arg}.txt"
-    try:
-        productName = open(filePath, 'r')
-        await ctx.send(f"Product already exsist!")
-    except IOError:
-        productName = open(filePath, 'w')
-        await ctx.send(f"Created product with name **{arg}**")
+    if any(role.id in config["restockerRole"] for role in ctx.author.roles):
+        filePath = f"accounts/{arg}.txt"
+        try:
+            productName = open(filePath, 'r')
+            await ctx.send(f"Product already exsist!")
+        except IOError:
+            productName = open(filePath, 'w')
+            await ctx.send(f"Created product with name **{arg}**")
 
 @client.command(name="dump")
-@commands.guild_only()
+@commands.guild_only() 
 @commands.has_permissions(administrator = True)
 async def dumpStock(ctx):
         dir_list = os.listdir("accounts")
