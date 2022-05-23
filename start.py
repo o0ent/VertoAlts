@@ -139,10 +139,10 @@ async def dumpStock(ctx):
         filePath = f"accounts/{productSel}.txt"
         if deleteType == "delProd":
             os.remove(filePath)
-            await ctx.send("Product deleted")
+            await interaction.send("Product deleted")
         elif deleteType == "delAccs":
             open(filePath, 'w').close()
-            await ctx.send("Accounts deleted")
+            await interaction.send("Accounts deleted")
 
 
 #Users commands
