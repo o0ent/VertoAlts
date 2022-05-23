@@ -1,4 +1,3 @@
-from asyncio.windows_events import NULL
 from discord_components import ComponentsBot,Button, Select, SelectOption
 from discord.ext import commands
 import discord.embeds
@@ -7,7 +6,7 @@ import json
 import os
 import time
 from discord.gateway import DiscordWebSocket
-from collections import Counter
+
 
 configFile = open("config.json")
 config = json.load(configFile)
