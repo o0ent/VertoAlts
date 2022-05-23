@@ -1,3 +1,4 @@
+from asyncio.windows_events import NULL
 from discord_components import ComponentsBot,Button, Select, SelectOption
 from discord.ext import commands
 import discord.embeds
@@ -12,7 +13,7 @@ configFile = open("config.json")
 config = json.load(configFile)
 
 client = ComponentsBot(command_prefix = config["prefix"])
-
+client.remove_command('help')
 
 def thousand_sep(num):
     return ("{:,}".format(num))
@@ -37,7 +38,7 @@ async def on_ready():
 
 #Admin commands
 
-@client.command(name="restock",descriprion="Restock product")
+@client.command(name="restock",description="Restock product")
 @commands.guild_only()
 @commands.has_permissions(administrator = True)
 async def reStock(ctx, arg):
@@ -59,7 +60,7 @@ async def reStock(ctx, arg):
 
         await ctx.send("Successfully restocked!")
 
-@client.command(name="create")
+@client.command(name="create",description="Create new product")
 @commands.guild_only()
 @commands.has_permissions(administrator = True)
 async def createStock(ctx, arg):
@@ -72,7 +73,7 @@ async def createStock(ctx, arg):
             productName = open(filePath, 'w')
             await ctx.send(f"Created product with name **{arg}**")
 
-@client.command(name="dump")
+@client.command(name="dump",description="Gets all accounts from product")
 @commands.guild_only() 
 @commands.has_permissions(administrator = True)
 async def dumpStock(ctx):
@@ -97,7 +98,7 @@ async def dumpStock(ctx):
         filePath = f"accounts/{interaction.values[0]}.txt"
         await interaction.send(file=discord.File(filePath))
 
-@client.command(name="delete")
+@client.command(name="delete",description="Deletes product or accounts")
 @commands.guild_only()
 @commands.has_permissions(administrator = True)
 async def dumpStock(ctx):
@@ -145,7 +146,7 @@ async def dumpStock(ctx):
 
 
 #Users commands
-@client.command(name="gen",descriprion="Generates account")
+@client.command(name="gen",description="Generates account")
 @commands.guild_only()
 async def genStock(ctx):
     if ctx.channel.id == config["channelId"]:
@@ -203,7 +204,7 @@ async def genStock(ctx):
         embed=discord.Embed(title="VertoAlts | Error",description = "You can't use commands in this channel", color=0xdd0000)
         await interaction.send(embed=embed)
 
-@client.command(name="stats",descriprion="Status")
+@client.command(name="stats",description="Shows product status")
 async def getStock(ctx):
     dir_list = os.listdir("accounts")
     embed=discord.Embed(title="VertoAlts | Statistic", description=f"We have a {len(dir_list)} products",color=0x999999)
@@ -213,6 +214,15 @@ async def getStock(ctx):
         totalAccs = open(f"accounts/{i}","r")
         embed.add_field(name=i.split(".txt")[0], value=thousand_sep(len(totalAccs.readlines())), inline=True)
         totalAccs.close()
+    embed.set_footer(text=f"requested by {ctx.author.name}#{ctx.author.discriminator}")
+    await ctx.send(embed=embed)
+
+@client.command(name="help",description="Show this message")
+async def getHelp(ctx):
+    embed=discord.Embed(title="VertoAlts | Help", description=f"Help me please!",color=0x999999)
+    embed.set_thumbnail(url="https://cdn.discordapp.com/attachments/956494913732743218/977163622017036318/White_Colorful_Modern_Gradient_Play_Media_Logo.png")
+    for i,x in  enumerate(client.commands):
+        embed.add_field(name=f"`{x}`", value=x.description, inline=True)
     embed.set_footer(text=f"requested by {ctx.author.name}#{ctx.author.discriminator}")
     await ctx.send(embed=embed)
 
