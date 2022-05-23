@@ -1,9 +1,8 @@
 {
-    "token":"Token bot",
+    "token":"Bot token",
     "prefix":">",
     "channelId":1234567890,
     "restockerRole":[1234567890,1234567890],
-    "accountstoGen":1,
     "deleteAccsfromDB":true,
     "phoneStatus":true
 }
