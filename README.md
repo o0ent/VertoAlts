@@ -9,7 +9,12 @@ Contributions are always welcome!
 
 Before starting you need create a bot and edit config.json
 
-Open cmd and write this command
+Open cmd and write this commands (make sure git is installed)
+
+```python
+py -m pip install -U git+https://github.com/Rapptz/discord.py
+```
+
 ```python
 pip install -r requirements.txt
 ```
